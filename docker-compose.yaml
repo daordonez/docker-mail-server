@@ -12,11 +12,11 @@ services:
       - "587:587"  # ESMTP (explicit TLS => STARTTLS)
       # - "993:993"  # IMAP4 (implicit TLS) #<-- IMAP4 disabled due to legacy protocl and insecurey
     volumes:
-      - dms/mail-data/:/var/mail/
-      - dms/mail-state/:/var/mail-state/
-      - dms/mail-logs/:/var/log/mail/
-      - dms/config/:/tmp/docker-mailserver/
-      - traefik/acme.json:/etc/letsencrypt/acme.json:ro
+      - dms:/var/mail/
+      - dms:/var/mail-state/
+      - dms:/var/log/mail/
+      - dms:/tmp/docker-mailserver/
+      - traefik:/etc/letsencrypt/acme.json:ro
       - /etc/localtime:/etc/localtime:ro
     restart: always
     stop_grace_period: 1m
@@ -49,7 +49,7 @@ services:
       - --certificatesresolvers.letsencrypt.acme.storage=/acme.json
       - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
     volumes:
-      - traefik/acme.json:/acme.json
+      - traefik:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
 volumes:
