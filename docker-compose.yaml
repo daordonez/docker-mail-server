@@ -51,6 +51,11 @@ services:
     volumes:
       - traefik:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock:ro
+  
+  whoami:
+    image: docker.io/traefik/whoami:latest
+    labels:
+      - "traefik.http.routers.whoami.rule=Host(`mta.monojaus.com`)"
 
 volumes:
   dms:
