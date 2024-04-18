@@ -1,3 +1,0 @@
-mail._domainkey IN      TXT     ( "v=DKIM1; h=sha256; k=rsa; "
-          "p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqEFCNCQ2+AVW6ywo2OrK4qY5CE69zauW6y55qpRJmTuLPGsjnj5V51Mzr3CPIU2o8Z9rMM13Jb5w0NsBji89D/qYmTxWYW3lW0on/asTp1objJBhNaG0pqXUJRmFHtATQ82JC85reLRuoxkp92ZPWuIZtHQxoY6o/mgmIcaaCI6/NiJsa4jL1c022ucvSIR//oQnJkYLvDNKyx"
-          "OdYVbK/6ilNnSKMEmrbID8BDeIpaPkWbEJ2tkofDLd0+lqzNE7bz8HP/6nv5+BTxEfeYFrfirLwOElCN4J+YCjzVXt19ZI6sitzYoOfqiXaInwlfZqOh9e3PxAB02TQEuZmU+nnwIDAQAB" )  ; ----- DKIM key mail for mta.monojaus.com
