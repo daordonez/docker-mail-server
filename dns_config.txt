@@ -1,0 +1,14 @@
+Server_IP=4.180.173.203
+PTR_Zone=173.180.4.in-addr.arpa
+
+
+# Setting of PTR record of a Public IP in Azure
+https://learn.microsoft.com/en-us/azure/dns/dns-reverse-dns-for-azure-services#code-try-1:~:text=To%20add%20reverse%20DNS%20to%20a%20public%20IP%20address%20that%20doesn%27t%20already%20have%20a%20PTR%2C%20you%20must%20specify%20the%20DomainNameLabel%3A
+
+It's needed to create a new object which will be set it up in the PublicIP itself
+
+$pip = Get-AzPublicIpAddress -Name "PublicIp" -ResourceGroupName "MyResourceGroup"
+$pip.DnsSettings = New-Object -TypeName "Microsoft.Azure.Commands.Network.Models.PSPublicIpAddressDnsSettings"
+$pip.DnsSettings.DomainNameLabel = "contosoapp1" #<-- This is just a label, but it's required.
+$pip.DnsSettings.ReverseFqdn = "contosoapp1.westus.cloudapp.azure.com."
+Set-AzPublicIpAddress -PublicIpAddress $pip
