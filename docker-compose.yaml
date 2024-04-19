@@ -16,7 +16,7 @@ services:
       - dms:/var/mail-state/
       - dms:/var/log/mail/
       - dms:/tmp/docker-mailserver/
-      - traefik:/etc/letsencrypt/acme.json:ro
+      - ./traefik/acme.json:/etc/letsencrypt/acme.json:ro
       - /etc/localtime:/etc/localtime:ro
     restart: always
     stop_grace_period: 1m
@@ -46,10 +46,10 @@ services:
       - --entrypoints.https.address=:443
       - --entrypoints.https.http.tls.certResolver=letsencrypt
       - --certificatesresolvers.letsencrypt.acme.email=me@diegordonez.com
-      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.storage=/acme.json
       - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
     volumes:
-      - traefik:/letsencrypt/acme.json:rw
+      - ./traefik/acme.json:/letsencrypt/acme.json
       - /var/run/docker.sock:/var/run/docker.sock:ro
   
   whoami:
@@ -61,4 +61,3 @@ services:
 
 volumes:
   dms:
-  traefik:
