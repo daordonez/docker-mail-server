@@ -27,6 +27,12 @@ services:
       - traefik.tcp.services.imap-ssl.loadbalancer.server.port=10993
       - traefik.tcp.routers.sieve.rule=HostSNI(`*`)
       - traefik.tcp.routers.sieve.service=sieve
+    environment:
+      - ENABLE_RSPAMD=1
+      - ENABLE_CLAMAV=1
+      - ENABLE_FAIL2BAN=1
+    cap_add:
+      - NET_ADMIN # For Fail2Ban to work
     volumes:
       - ./dms/mail-data/:/var/mail/
       - ./dms/mail-state/:/var/mail-state/
