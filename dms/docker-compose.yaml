@@ -2,72 +2,82 @@ services:
   mailserver:
     image: ghcr.io/docker-mailserver/docker-mailserver:latest
     container_name: mailserver
-    # Provide the FQDN of your mail server here (Your DNS MX record should point to this value)
     hostname: mta.monojaus.com
-    ports:
-      - "25:25"    # SMTP  (explicit TLS => STARTTLS, Authentication is DISABLED => use port 465/587 instead)
-      # - "143:143"  # IMAP4 (explicit TLS => STARTTLS) #<-- IMAP4 disabled due to legacy protocl and insecurey
-      - "465:465"  # ESMTP (implicit TLS)
-      - "587:587"  # ESMTP (explicit TLS => STARTTLS)
-      # - "993:993"  # IMAP4 (implicit TLS) #<-- IMAP4 disabled due to legacy protocl and insecurey
+    restart: always
+    labels:
+      - traefik.enable=true #Indicates traefik is a routable host
+      - traefik.tcp.routers.smtp.rule=HostSNI(`*`) #Listening point for SMTP communication
+      - traefik.tcp.routers.smtp.service=smtp # Gets entrypoint created at traefik (main rp)
+      - traefik.tcp.services.smtp.loadbalancer.server.port=25
+      - traefik.tcp.services.smtp.loadbalancer.proxyProtocol.version=1
+      # Labels below defines SSL configuration for mailserver
+      - traefik.tcp.routers.smtp-ssl.rule=HostSNI(`*`) #Listening point for SMTP communication over TLS
+      - traefik.tcp.routers.smtp-ssl.tls.passthrough=true #SSL termination disabled
+      - traefik.tcp.routers.smtp-ssl.service=smtp-ssl
+      - traefik.tcp.services.smtp-ssl.loadbalancer.server.port=465 # It defines secure port for TLS
+      - traefik.tcp.services.smtp-ssl.loadbalancer.proxyProtocol.version=1
+      # The following labels applies to IMAP and Sieve services, but it's intended to be disabled
+      - traefik.tcp.services.imap-ssl.loadbalancer.proxyProtocol.version=2
+      - traefik.tcp.routers.imap-ssl.rule=HostSNI(`*`)
+      - traefik.tcp.routers.sieve.entrypoints=sieve
+      - traefik.tcp.routers.imap-ssl.entrypoints=imap-ssl
+      - traefik.tcp.services.sieve.loadbalancer.server.port=4190
+      - traefik.tcp.routers.imap-ssl.service=imap-ssl
+      - traefik.tcp.routers.imap-ssl.tls.passthrough=true
+      - traefik.tcp.services.imap-ssl.loadbalancer.server.port=10993
+      - traefik.tcp.routers.sieve.rule=HostSNI(`*`)
+      - traefik.tcp.routers.sieve.service=sieve
     volumes:
       - dms:/var/mail/
       - dms:/var/mail-state/
       - dms:/var/log/mail/
       - dms:/tmp/docker-mailserver/
-      - ./traefik/acme.json:/etc/letsencrypt/acme.json:ro
       - /etc/localtime:/etc/localtime:ro
-    restart: always
-    stop_grace_period: 1m
-    # Uncomment if using `ENABLE_FAIL2BAN=1`:
-    # cap_add:
-    #   - NET_ADMIN
-    healthcheck:
-      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
-      timeout: 3s
-      retries: 0
     depends_on:
       - reverse-proxy
   
   reverse-proxy:
-    image: docker.io/traefik:latest #v2.5
+    image: traefik:v2.11
     container_name: traefik
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      # From here on, it's the mailserver definition
+      - --entryPoints.smtp.address=:25
+      - --entryPoints.smtp-ssl.address=:465
+      - --entryPoints.imap-ssl.address=:993
+      - --entryPoints.sieve.address=:4190
+      # Ending mailserver definition
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entryPoint=web
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.myresolver.acme.email=me@diegordonez.com
     ports:
-      - "8080:8080"
-      - "80:80"
       - "443:443"
+      - "80:80"
+      - "8080:8080"
+      # From here on, it's the mailserver definition
       - "25:25"
       - "465:465"
       - "993:993"
       - "4190:4190"
-    command:
-      - --api.insecure=true
-      - --providers.docker
-      - "--providers.docker.network=proxy"
-      - --entrypoints.http.address=:80
-      - --entrypoints.http.http.redirections.entryPoint.to=https
-      - --entrypoints.http.http.redirections.entryPoint.scheme=https
-      - --entrypoints.https.address=:443
-      - --entrypoints.https.http.tls.certResolver=letsencrypt
-      - --certificatesresolvers.letsencrypt.acme.email=me@diegordonez.com
-      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
-      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
-      - "--entrypoints.web.address=:80"
-      - "--entryPoints.websecure.address=:443"
-      - "--entryPoints.smtp.address=:25"
-      - "--entryPoints.smtp-ssl.address=:465"
-      - "--entryPoints.imap-ssl.address=:993"
-      - "--entryPoints.sieve.address=:4190"
+      - "10993:10993" # Is used here to avoid conflicts with Dovecot
+
+      # Ending mailserver definition
     volumes:
-      - ./traefik:/letsencrypt
+      - ./letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
   
   whoami:
-    image: docker.io/traefik/whoami:latest
+    image: traefik/whoami
+    container_name: test-services
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`mta.monojaus.com`)"
-      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
 
 volumes:
   dms:
