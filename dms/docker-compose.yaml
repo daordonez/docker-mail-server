@@ -28,10 +28,10 @@ services:
       - traefik.tcp.routers.sieve.rule=HostSNI(`*`)
       - traefik.tcp.routers.sieve.service=sieve
     volumes:
-      - dms:/var/mail/
-      - dms:/var/mail-state/
-      - dms:/var/log/mail/
-      - dms:/tmp/docker-mailserver/
+      - ./dms/mail-data/:/var/mail/
+      - ./dms/mail-state/:/var/mail-state/
+      - ./dms/mail-logs/:/var/log/mail/
+      - ./dms/config/:/tmp/docker-mailserver/
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - reverse-proxy
@@ -78,6 +78,3 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`mta.monojaus.com`)"
       - "traefik.http.routers.whoami.tls.certresolver=myresolver"
-
-volumes:
-  dms:
