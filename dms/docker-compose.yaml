@@ -36,19 +36,30 @@ services:
       - "8080:8080"
       - "80:80"
       - "443:443"
+      - "25:25"
+      - "465:465"
+      - "993:993"
+      - "4190:4190"
     command:
       - --api.insecure=true
       - --providers.docker
+      - "--providers.docker.network=proxy"
       - --entrypoints.http.address=:80
       - --entrypoints.http.http.redirections.entryPoint.to=https
       - --entrypoints.http.http.redirections.entryPoint.scheme=https
       - --entrypoints.https.address=:443
       - --entrypoints.https.http.tls.certResolver=letsencrypt
       - --certificatesresolvers.letsencrypt.acme.email=me@diegordonez.com
-      - --certificatesresolvers.letsencrypt.acme.storage=/acme.json
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
+      - "--entrypoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--entryPoints.smtp.address=:25"
+      - "--entryPoints.smtp-ssl.address=:465"
+      - "--entryPoints.imap-ssl.address=:993"
+      - "--entryPoints.sieve.address=:4190"
     volumes:
-      - ./traefik/acme.json:/letsencrypt/acme.json
+      - ./traefik:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
   
   whoami:
