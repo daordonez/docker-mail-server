@@ -35,6 +35,11 @@ services:
       - SSL_DOMAIN=mta.monojaus.com
     cap_add:
       - NET_ADMIN # For Fail2Ban to work
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
+      - "993:993"
     volumes:
       - ./dms/mail-data/:/var/mail/
       - ./dms/mail-state/:/var/mail-state/
