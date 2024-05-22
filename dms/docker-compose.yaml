@@ -7,26 +7,29 @@ services:
     labels:
       - traefik.enable=true #Indicates traefik is a routable host
       - traefik.tcp.routers.smtp.rule=HostSNI(`*`) #Listening point for SMTP communication
+      - traefik.tcp.routers.smtp.entrypoints=smtp
       - traefik.tcp.routers.smtp.service=smtp # Gets entrypoint created at traefik (main rp)
       - traefik.tcp.services.smtp.loadbalancer.server.port=25
       - traefik.tcp.services.smtp.loadbalancer.proxyProtocol.version=1
       # Labels below defines SSL configuration for mailserver
       - traefik.tcp.routers.smtp-ssl.rule=HostSNI(`*`) #Listening point for SMTP communication over TLS
+      - traefik.tcp.routers.smtp-ssl.entrypoints=smtp-ssl
       - traefik.tcp.routers.smtp-ssl.tls.passthrough=true #SSL termination disabled
       - traefik.tcp.routers.smtp-ssl.service=smtp-ssl
       - traefik.tcp.services.smtp-ssl.loadbalancer.server.port=465 # It defines secure port for TLS
       - traefik.tcp.services.smtp-ssl.loadbalancer.proxyProtocol.version=1
       # The following labels applies to IMAP and Sieve services, but it's intended to be disabled
-      - traefik.tcp.services.imap-ssl.loadbalancer.proxyProtocol.version=2
       - traefik.tcp.routers.imap-ssl.rule=HostSNI(`*`)
-      - traefik.tcp.routers.sieve.entrypoints=sieve
       - traefik.tcp.routers.imap-ssl.entrypoints=imap-ssl
-      - traefik.tcp.services.sieve.loadbalancer.server.port=4190
       - traefik.tcp.routers.imap-ssl.service=imap-ssl
       - traefik.tcp.routers.imap-ssl.tls.passthrough=true
       - traefik.tcp.services.imap-ssl.loadbalancer.server.port=10993
+      - traefik.tcp.services.imap-ssl.loadbalancer.proxyProtocol.version=2
+      #Sieve
       - traefik.tcp.routers.sieve.rule=HostSNI(`*`)
+      - traefik.tcp.routers.sieve.entrypoints=sieve
       - traefik.tcp.routers.sieve.service=sieve
+      - traefik.tcp.services.sieve.loadbalancer.server.port=4190
     environment:
       - ENABLE_RSPAMD=1
       - ENABLE_CLAMAV=1
