@@ -4,15 +4,17 @@ services:
     hostname: mta.monojaus.com
     labels:
       - traefik.enable=true
+
       # Explicit TLS (STARTTLS):
       - traefik.tcp.routers.mail-smtp.rule=HostSNI(`*`)
-      - traefik.tcp.routers.mail-smtp.entrypoints=smtp
-      - traefik.tcp.routers.mail-smtp.service=smtp
+      - traefik.tcp.routers.mail-smtp.entrypoints=mail-smtp
+      - traefik.tcp.routers.mail-smtp.service=mail-smtp
       - traefik.tcp.services.mail-smtp.loadbalancer.server.port=25
       - traefik.tcp.services.mail-smtp.loadbalancer.proxyProtocol.version=2
 
       # Implicit TLS is no different, except for optional HostSNI support:
-      - traefik.tcp.routers.mail-submissions.rule=HostSNI(`*`)
+      - traefik.tcp.routers.mail-submissions.rule=HostSNI(`mta.monojaus.com`)
+      - traefik.tcp.routers.mail-submissions.tls.passthrough=true
       - traefik.tcp.routers.mail-submissions.entrypoints=smtp-submissions
       - traefik.tcp.routers.mail-submissions.service=smtp-submissions
       - traefik.tcp.services.mail-submissions.loadbalancer.server.port=465
@@ -30,6 +32,9 @@ services:
   reverse-proxy:
     image: docker.io/traefik:latest
     command:
+      - --api.insecure=true
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
       # Docker provider config:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
@@ -49,6 +54,11 @@ services:
       - --certificatesresolvers.myresolver.acme.email=me@diegordonez.com
     # Publish external access ports mapped to traefik entrypoint ports:
     ports:
+      #traefik dashboard
+      - "443:443"
+      - "80:80"
+      - "8080:8080"
+      #DMS
       - "25:25"
       - "587:587"
       - "465:465"
