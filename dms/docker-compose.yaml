@@ -15,8 +15,8 @@ services:
       # Implicit TLS is no different, except for optional HostSNI support:
       - traefik.tcp.routers.mail-submissions.rule=HostSNI(`mta.monojaus.com`)
       - traefik.tcp.routers.mail-submissions.tls.passthrough=true
-      - traefik.tcp.routers.mail-submissions.entrypoints=smtp-submissions
-      - traefik.tcp.routers.mail-submissions.service=smtp-submissions
+      - traefik.tcp.routers.mail-submissions.entrypoints=mail-submissions
+      - traefik.tcp.routers.mail-submissions.service=mail-submissions
       - traefik.tcp.services.mail-submissions.loadbalancer.server.port=465
       - traefik.tcp.services.mail-submissions.loadbalancer.proxyProtocol.version=2
     volumes:
