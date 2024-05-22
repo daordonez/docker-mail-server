@@ -1,6 +1,7 @@
 services:
   dms:
     image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
     hostname: mta.monojaus.com
     labels:
       - traefik.enable=true
@@ -31,6 +32,7 @@ services:
 
   reverse-proxy:
     image: docker.io/traefik:latest
+    container_name: traefik
     command:
       - --api.insecure=true
       - --entryPoints.web.address=:80
