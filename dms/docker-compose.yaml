@@ -3,9 +3,14 @@ services:
     image: ghcr.io/docker-mailserver/docker-mailserver:latest
     container_name: mailserver
     hostname: mta.monojaus.com
+    depends_on: reverse-proxy
+    environment:
+      - TZ=Europe/Madrid
+      - SSL_TYPE=letsencrypt
+      - SSL_DOMAIN=mta.monojaus.com
+      - TLS_LEVEL=intermediate
     labels:
       - traefik.enable=true
-
       # Explicit TLS (STARTTLS):
       - traefik.tcp.routers.mail-smtp.rule=HostSNI(`*`)
       - traefik.tcp.routers.mail-smtp.entrypoints=mail-smtp
@@ -27,8 +32,6 @@ services:
       - ./dms/config/:/tmp/docker-mailserver/
       - ./letsencrypt/acme.json:/etc/letsencrypt/acme.json:ro
       - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - reverse-proxy
 
   reverse-proxy:
     image: docker.io/traefik:latest
@@ -36,13 +39,18 @@ services:
     command:
       - --api.insecure=true
       - --entryPoints.web.address=:80
+      # SSL/TLS certs config
       - --entryPoints.websecure.address=:443
+      - --entrypoints.http.http.redirections.entryPoint.to=https
+      - --entrypoints.http.http.redirections.entryPoint.scheme=https
       # Docker provider config:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       # DMS ports you want to proxy:
       - --entryPoints.mail-smtp.address=:25
+      # Explicit TLS - legacy compatibility
       - --entryPoints.mail-submission.address=:587
+      # Implicit TLS - Preferred
       - --entryPoints.mail-submissions.address=:465
       - --entryPoints.mail-imap.address=:143
       - --entryPoints.mail-imaps.address=:993
