@@ -13,7 +13,7 @@ services:
     labels:
       - traefik.enable=true
       # Explicit TLS (STARTTLS):
-      - traefik.tcp.routers.mail-smtp.rule=HostSNI(`*`)
+      - traefik.tcp.routers.mail-smtp.rule=HostSNI(`mta.monojaus.com`)
       - traefik.tcp.routers.mail-smtp.entrypoints=mail-smtp
       - traefik.tcp.routers.mail-smtp.service=mail-smtp
       - traefik.tcp.services.mail-smtp.loadbalancer.server.port=25
