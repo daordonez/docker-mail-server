@@ -31,7 +31,7 @@ services:
       - ./dms/mail-state/:/var/mail-state/
       - ./dms/mail-logs/:/var/log/mail/
       - ./dms/config/:/tmp/docker-mailserver/
-      - ./letsencrypt/acme.json:/etc/letsencrypt/acme.json:ro
+      - ./traefik/acme.json:/etc/traefik/acme.json:ro
       - /etc/localtime:/etc/localtime:ro
 
   reverse-proxy:
