@@ -3,7 +3,8 @@ services:
     image: ghcr.io/docker-mailserver/docker-mailserver:latest
     container_name: mailserver
     hostname: mta.monojaus.com
-    depends_on: reverse-proxy
+    depends_on: 
+      - reverse-proxy
     environment:
       - TZ=Europe/Madrid
       - SSL_TYPE=letsencrypt
