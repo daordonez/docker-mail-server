@@ -59,10 +59,10 @@ services:
       - --entryPoints.mail-pop3s.address=:995
       - --entryPoints.mail-managesieve.address=:4190
       # Ending mailserver definition
-      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
-      - --certificatesresolvers.myresolver.acme.email=me@diegordonez.com
       - --certificatesresolvers.myresolver.acme.httpchallenge=true
       - --certificatesresolvers.myresolver.acme.httpchallenge.entryPoint=web
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.myresolver.acme.email=me@diegordonez.com
     # Publish external access ports mapped to traefik entrypoint ports:
     ports:
       #traefik dashboard
