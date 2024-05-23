@@ -61,7 +61,7 @@ services:
       - --entryPoints.mail-managesieve.address=:4190
       # Ending mailserver definition
       - --entrypoints.https.http.tls.certResolver=letsencrypt
-      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.storage=/acme.json
       - --certificatesresolvers.letsencrypt.acme.email=me@diegordonez.com
       - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
       - --certificatesresolvers.letsencrypt.acme.httpchallenge.entryPoint=web
@@ -85,8 +85,8 @@ services:
       default:
         ipv4_address: 172.16.42.2
     volumes:
-      - ./letsencrypt:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./letsencrypt/acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
 networks:
   default:
