@@ -35,7 +35,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
 
   reverse-proxy:
-    image: docker.io/traefik:latest
+    image: traefik:v2.11
     container_name: traefik
     command:
       - --api.insecure=true
