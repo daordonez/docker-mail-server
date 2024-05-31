@@ -15,6 +15,7 @@ services:
       # Explicit TLS (STARTTLS):
       - traefik.tcp.routers.mail-smtp.rule=HostSNI(`*`)
       - traefik.tcp.routers.mail-smtp.entrypoints=mail-smtp
+      - traefik.tcp.routers.mail-smtp.tls.passthrough=true
       - traefik.tcp.routers.mail-smtp.service=mail-smtp
       - traefik.tcp.services.mail-smtp.loadbalancer.server.port=25
       - traefik.tcp.services.mail-smtp.loadbalancer.proxyProtocol.version=2
@@ -38,13 +39,12 @@ services:
     image: traefik:v2.11
     container_name: traefik
     command:
-      - --api.insecure=true
-      - --entryPoints.web.address=:80
-      # SSL/TLS certs config
-      - --entryPoints.websecure.address=:443
       # Docker provider config:
+      - --api.insecure=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
       # DMS ports you want to proxy:
       - --entryPoints.mail-smtp.address=:25
       # Explicit TLS - legacy compatibility
@@ -81,7 +81,7 @@ services:
       default:
         ipv4_address: 172.16.42.2
     volumes:
-      - ./traefik:/traefik/acme.json
+      - ./traefik:/traefik
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
 networks:
