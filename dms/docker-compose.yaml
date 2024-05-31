@@ -11,28 +11,28 @@ services:
       - SSL_DOMAIN=mta.monojaus.com
       - TLS_LEVEL=intermediate
     labels:
-      - traefik.enable=true
+      - "traefik.enable=true"
       # Explicit TLS (STARTTLS):
-      - traefik.tcp.routers.mail-smtp.rule=HostSNI(`*`)
-      - traefik.tcp.routers.mail-smtp.entrypoints=mail-smtp
-      - traefik.tcp.routers.mail-smtp.tls.passthrough=true
-      - traefik.tcp.routers.mail-smtp.service=mail-smtp
-      - traefik.tcp.services.mail-smtp.loadbalancer.server.port=25
-      - traefik.tcp.services.mail-smtp.loadbalancer.proxyProtocol.version=2
+      - "traefik.tcp.routers.mail-smtp.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.mail-smtp.entrypoints=mail-smtp"
+      - "traefik.tcp.routers.mail-smtp.tls.passthrough=true"
+      - "traefik.tcp.routers.mail-smtp.service=mail-smtp"
+      - "traefik.tcp.services.mail-smtp.loadbalancer.server.port=25"
+      - "traefik.tcp.services.mail-smtp.loadbalancer.proxyProtocol.version=2"
 
       # Implicit TLS is no different, except for optional HostSNI support:
-      - traefik.tcp.routers.mail-submissions.rule=HostSNI(`mta.monojaus.com`)
-      - traefik.tcp.routers.mail-submissions.tls.passthrough=true
-      - traefik.tcp.routers.mail-submissions.entrypoints=mail-submissions
-      - traefik.tcp.routers.mail-submissions.service=mail-submissions
-      - traefik.tcp.services.mail-submissions.loadbalancer.server.port=465
-      - traefik.tcp.services.mail-submissions.loadbalancer.proxyProtocol.version=2
+      - "traefik.tcp.routers.mail-submissions.rule=HostSNI(`mta.monojaus.com`)"
+      - "traefik.tcp.routers.mail-submissions.tls.passthrough=true"
+      - "traefik.tcp.routers.mail-submissions.entrypoints=mail-submissions"
+      - "traefik.tcp.routers.mail-submissions.service=mail-submissions"
+      - "traefik.tcp.services.mail-submissions.loadbalancer.server.port=465"
+      - "traefik.tcp.services.mail-submissions.loadbalancer.proxyProtocol.version=2"
     volumes:
       - ./dms/mail-data/:/var/mail/
       - ./dms/mail-state/:/var/mail-state/
       - ./dms/mail-logs/:/var/log/mail/
       - ./dms/config/:/tmp/docker-mailserver/
-      - ./traefik/acme.json:/etc/traefik/acme.json:ro
+      - ./letsencrypt/acme.json:/etc/letsencrypt/acme.json:ro
       - /etc/localtime:/etc/localtime:ro
 
   reverse-proxy:
@@ -40,27 +40,27 @@ services:
     container_name: traefik
     command:
       # Docker provider config:
-      - --api.insecure=true
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-      - --entryPoints.web.address=:80
-      - --entryPoints.websecure.address=:443
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
       # DMS ports you want to proxy:
-      - --entryPoints.mail-smtp.address=:25
+      - "--entryPoints.mail-smtp.address=:25"
       # Explicit TLS - legacy compatibility
-      - --entryPoints.mail-submission.address=:587
+      - "--entryPoints.mail-submission.address=:587"
       # Implicit TLS - Preferred
-      - --entryPoints.mail-submissions.address=:465
-      - --entryPoints.mail-imap.address=:143
-      - --entryPoints.mail-imaps.address=:993
-      - --entryPoints.mail-pop3.address=:110
-      - --entryPoints.mail-pop3s.address=:995
-      - --entryPoints.mail-managesieve.address=:4190
+      - "--entryPoints.mail-submissions.address=:465"
+      - "--entryPoints.mail-imap.address=:143"
+      - "--entryPoints.mail-imaps.address=:993"
+      - "--entryPoints.mail-pop3.address=:110"
+      - "--entryPoints.mail-pop3s.address=:995"
+      - "--entryPoints.mail-managesieve.address=:4190"
       # Ending mailserver definition
-      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
-      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entryPoint=web
-      - --certificatesresolvers.letsencrypt.acme.storage=/traefik/acme.json
-      - --certificatesresolvers.letsencrypt.acme.email=me@diegordonez.com
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesresolvers.le.acme.httpchallenge.entryPoint=web"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.le.acme.email=me@diegordonez.com"
     # Publish external access ports mapped to traefik entrypoint ports:
     ports:
       #traefik dashboard
@@ -81,8 +81,8 @@ services:
       default:
         ipv4_address: 172.16.42.2
     volumes:
-      - ./traefik/acme.json:/traefik/acme.json
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
 networks:
   default:
