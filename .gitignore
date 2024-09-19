@@ -1,0 +1,49 @@
+# Terraform local state files
+*.tfstate
+*.tfstate.*
+
+# Terraform crash logs
+crash.log
+
+# Terraform variable override files
+*.tfvars
+*.tfvars.json
+
+# Terraform plan files
+*.tfplan
+
+# .terraform directory (terraform providers/plugins)
+.terraform/
+.terraform.lock.hcl
+
+# Lock files
+*.lock
+
+# Ignorar cualquier archivo env.sh o .env en cualquier nivel de la estructura de carpetas
+**/env.sh
+**/.env
+**/*.env
+
+# Docker Compose override files y logs
+docker-compose.override.yml
+*.log
+
+# Archivos sensibles relacionados con claves SSH o configuraciones de autenticación
+*.pem
+*.key
+*.crt
+
+# Archivos de configuración del IDE
+.vscode/
+.idea/
+
+# Logs y archivos temporales del sistema
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Directorios de dependencias de node o python (si el proyecto los utiliza)
+node_modules/
+venv/
+__pycache__/
