@@ -21,12 +21,17 @@ variable "resource_group" {
 variable "vnet_name" {
   description = "Set a name for the new virtual network"
   type = string
-  default = "vnet-network-tf"
+  default = "network01"
 }
 variable "subnet_prefix_name" {
   description = "Set a specific prefix for subnet name for better identification"
   type = string
-  default = "module"
+  default = ""
+}
+variable "subnet_name" {
+  description = "Set a name for the main subnet"
+  type = string
+  default = "subnet01"
 }
 
 variable "vnet_cidr" {
@@ -38,7 +43,7 @@ variable "vnet_cidr" {
 variable "nsg_name" {
   description = "Set a name for the new network security group"
   type = string
-  default = "nsg-network-tf"
+  default = "nsg"
 }
 
 variable "tags" {

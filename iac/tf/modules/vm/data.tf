@@ -2,3 +2,7 @@
 data "azurerm_resource_group" "rg-main" {
   name = var.resource_group
 }
+
+data "external" "myipaddr" {
+  program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
+}
