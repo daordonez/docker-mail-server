@@ -1,6 +1,7 @@
 # Terraform local state files
 *.tfstate
 *.tfstate.*
+*.tfplan
 
 # Terraform crash logs
 crash.log
